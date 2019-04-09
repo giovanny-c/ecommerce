@@ -1,24 +1,30 @@
 <?php 
 
-require_once("vendor/autoload.php");
+require_once("vendor/autoload.php");// do composer, para trazer as dependencias necessarias do projeto
 
-use \Slim\Slim;
-use \Hcode\Page;
+//quais namespaces/classes que serao usadas
+use \Slim\Slim; // usando a classe Slim do namespace Slim
+use \Hcode\Page;//usando a classe Page do namespace Hcode
 
-$app = new Slim();
+$app = new Slim();//criando nova aplicação do slim para facilitar, cria uma nova rota?
 
 $app->config('debug', true);
 
-$app->get('/', function() {  // rota principal
+//realmente importante ------
+$app->get('/', function() {  // Qual rota esta sendo chamada ===> rota principal
 
-	$page = new Page();
+	$page = new Page();//instanciando a classe page
+	//quando criado chama metodo construct que chama o header.html na tela
 
-	$page->setTpl("index");
+	$page->setTpl("index");// usando o setTpl com o parametro index para chamar o arquivo index.html
+	//vai usar o arquivo"ecommerce/views/header.html"
     
+
+    //vai chamar o destruct que chama footer ao final da execução
 
 
 });
 
-$app->run();
+$app->run();//roda o codigo que estiver dentro da rota
 
  ?>
