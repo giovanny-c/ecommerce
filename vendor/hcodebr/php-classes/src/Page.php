@@ -16,15 +16,16 @@ use Rain\Tpl; // usando o namespace rain, quando for chamado a classe tpl
                             ];
 
 
-		public function __construct($opts = array()){
-		//por padrao é array
-		//vai construir a pagina
-
+		public function __construct($opts = array(), $tpl_dir = "/views/"){
+		//$opts por padrao é array		
+		//$tpl_dir por padrao é "/views/"
+        //vai construir a pagina
+			
 			$this->options = array_merge($this->defaults, $opts);//atributo $options é igual ao $defaults +  o que vier de parametro no metodo construtor  
 
 			$config = array(
 			//$_SERVER["DOCUMENT ROOT"] vai trazer a pasta root do seu servidor, no caso será "ecommerce"
-						"tpl_dir"       => $_SERVER["DOCUMENT_ROOT"]."/views/",//pasta onde será encontrado os arquivos html "ecommerce/views"
+						"tpl_dir"       => $_SERVER["DOCUMENT_ROOT"].$tpl_dir,//pasta onde será encontrado os arquivos html "ecommerce/views"
 						"cache_dir"     => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",//pasta do cache dos arquivos html
 						"debug"         => false // set to false to improve the speed
 					     );
