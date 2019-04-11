@@ -12,8 +12,8 @@ use Rain\Tpl; // usando o namespace rain, quando for chamado a classe tpl
         private $tpl;
         private $options = [];//array
         private $defaults = [  //opções padrao para a construção
-                         "header"=>true,
-                         "footer"=>true,
+                         "header"=>true,//padrao para o header
+                         "footer"=>true,//padrao para o footer
                          "data"=>[]
                             ];
 
@@ -42,6 +42,8 @@ use Rain\Tpl; // usando o namespace rain, quando for chamado a classe tpl
 		    // as variaveis vao vir de acordo com a rota (ver ecommerce/index.php)
 
 		    if($this->options["header"] === true) $this->tpl->draw("header");//se o valor do index header de $options for true, desenha o template, usando o nome do arquivo,
+		    //usa o valor de header para validar, se vai ser desenhado o template ou nao ( ver ecommerce/index.php -- rota do login do administrador )
+
 		    // a estenção padrao é .html
 		    //vai usar o arquivo "ecommerce/views/header.html" 
 
@@ -79,6 +81,8 @@ use Rain\Tpl; // usando o namespace rain, quando for chamado a classe tpl
 		public function __destruct(){
 
 			if($this->options["footer"] === true) $this->tpl->draw("footer");//se o index footer de $options for true "desenha" o footer  é o final do html onde pode ser colocado o java script e outras infos.
+			//usa o valor de footer para validar, se vai ser desenhado o template ou nao ( ver ecommerce/index.php -- rota do login do administrador )
+
 			//vai usar o arquivo "ecommerce/views/header.html"
 
 		}
