@@ -88,6 +88,118 @@ $app->get('/admin/logout', function(){//Qual rota esta sendo chamada ===> rota d
 });
 
 
+$app->get("/admin/users", function(){//Qual rota esta sendo chamada ===> rota do logout do adminstrador / user
+
+	User::verifyLogin();//metodo statico para verificar login
+
+	$users = User::listAll();//metodo statico para listar os usuarios
+
+	$page = new PageAdmin();//instanciando a classe PageAdmin
+	//quando criado chama metodo construct que chama o header.html na tela
+
+	$page->setTpl("users", array(
+		"users"=>$users
+						));
+
+							// usando o setTpl com o parametro users para chamar o arquivousers.html
+	//vai usar o arquivo"ecommerce/views/admin/users.html"
+
+});
+
+
+$app->get("/admin/users/create", function(){ //Qual rota esta sendo chamada ===> rota do logout do adminstrador / create
+
+	User::verifyLogin();//metodo statico para verificar login
+
+	$page = new PageAdmin();//instanciando a classe PageAdmin
+	//quando criado chama metodo construct que chama o header.html na tela
+
+	$page->setTpl("users-create");// usando o setTpl com o parametro users para chamar o arquivousers.html
+	//vai usar o arquivo"ecommerce/views/admin/users.html"
+
+});
+
+
+$app->get("/admin/users/:iduser/delete", function($iduser){
+
+	User::verifyLogin();
+
+	$user = new User();
+
+	$user->get((int)$iduser);
+
+	$user->delete();
+
+	header("Location: /admin/users");
+
+	exit;
+
+});
+
+
+$app->get("/admin/users/:iduser", function($iduser){ //Qual rota esta sendo chamada ===> rota do logout do adminstrador / update
+
+	User::verifyLogin();//metodo statico para verificar login
+
+	$user = new User();
+
+	$user->get((int)$iduser);
+
+	$page = new PageAdmin();//instanciando a classe PageAdmin
+	//quando criado chama metodo construct que chama o header.html na tela
+
+	$page->setTpl("users-update", array(
+					"user"=>$user->getValues()
+				));
+
+	// usando o setTpl com o parametro users para chamar o arquivousers.html
+	//vai usar o arquivo"ecommerce/views/admin/users.html"
+
+});
+/**/
+$app->post("/admin/users/create", function(){
+
+	User::verifyLogin();
+
+	$user = new User();
+
+	$_POST["inadmin"] = (isset($_POST["inadmin"]))?1:0;
+
+	$user->setData($_POST);
+
+	$user->save();
+
+	header("Location: /admin/users");
+
+	exit;
+
+
+});
+
+$app->post("/admin/users/:iduser", function($iduser){
+
+	User::verifyLogin();
+
+	$user = new User();
+
+	$_POST["inadmin"] = (isset($_POST["inadmin"]))?1:0;
+
+	$user->get((int)$iduser);
+
+	$user->setData($_POST);
+
+	$user->update();
+
+	header("Location: /admin/users");
+
+	exit;
+
+});
+
+
+
+
+
 
 
 
