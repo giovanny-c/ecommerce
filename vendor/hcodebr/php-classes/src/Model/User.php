@@ -87,77 +87,75 @@ class User extends Model{ //extende da classe model
 	}
 
 
-	public static function listAll(){
+	//nao usa o metodo __call()
+	public static function listAll(){//le todos os dados da tabela
 
 		$sql = new Sql();
 
 		return $sql->select(
-			"SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson"
-			);
-
-
-
-
+			"SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson" 
+			);//une a tabela tb_users com tb_person e 
 
 	}
 
 
-	public function save(){
+	public function save(){//executa o insert do novo cadastro, retorna o iduser
 
 		$sql = new Sql();
 	
 
 		$results = $sql->select("CALL sp_users_save( :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin )", 
-			array(
+			array(//parametros pegos com o __call, que estão no objeto
    				":desperson"=> $this->getdesperson(),
    				":deslogin"=> $this->getdeslogin(),
    				":despassword"=> $this->getdespassword(),
    				":desemail"=> $this->getdesemail(),
    				":nrphone"=> $this->getnrphone(),
    				":inadmin"=> $this->getinadmin()         
-			));
+			));//usando a procedure criada no banco, tornando o processo mais rapido, vai cadastrar o usuario no tb_person e tb_user e vai retornar o ID cadastrado
 
-			$this->setData($results[0]);
+			$this->setData($results[0]);//vai rearmazenar os dados que retornaram novamente no objeto
+
 
 	}
 
 
-	public function get($iduser){
+	public function get($iduser){//vai usar o parametro $iduser para pegar o id e buscar o seu cadastro
 	 
 		$sql = new Sql();
 		 
 		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser;", array(
 			":iduser"=>$iduser
-			));
+			));//faz um select pelo iduser
 		 
-		$data = $results[0];
+		$data = $results[0];//armazena em o resultado
 		 
-		$this->setData($data);
+		$this->setData($data);//joga no setData, para ser armazenado no objeto
 	 
 	}
 
-	public function update(){
+	public function update(){//executa o update
 
 		$sql = new Sql();
 
 		$results = $sql->select("CALL sp_usersupdate_save( :iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin )", 
 			array(
-				":iduser"=>$this->getiduser(),
+				":iduser"=>$this->getiduser(),//usando o iduser para fazer o update
    				":desperson"=> $this->getdesperson(),
    				":deslogin"=> $this->getdeslogin(),
    				":despassword"=> $this->getdespassword(),
    				":desemail"=> $this->getdesemail(),
    				":nrphone"=> $this->getnrphone(),
    				":inadmin"=> $this->getinadmin()         
-			));
+			));//usando a procedure criada no banco, tornando o processo mais rapido, vai atualizar o usuario no tb_person e tb_user e vai retornar o ID do cadastro atualizado
 
-			$this->setData($results[0]);
+			$this->setData($results[0]);//vai rearmazenar os dados que retornaram novamente no objeto
 
 
 	}
 
 
-	public function delete(){
+	public function delete(){//executa o delete	
 
 
 		$sql = new Sql();
@@ -165,7 +163,7 @@ class User extends Model{ //extende da classe model
 
 		$sql->query("CALL sp_users_delete(:iduser)",array(
 			":iduser"=>$this->getiduser()
-		));
+		));//usando a procedure criada no banco, tornando o processo mais rapido, vai deletar o usuario no tb_person e tb_user 
 	}
 
 }
