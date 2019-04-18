@@ -10,6 +10,7 @@ use \Slim\Slim; // usando a classe Slim do namespace Slim
 use \Hcode\Page;//usando a classe Page do namespace Hcode
 use \Hcode\PageAdmin;//usando a classe PageAdmin do namespace Hcode
 use \Hcode\Model\User;//usando a classe User do namespace Model do namespace Hcode
+use \Hcode\Model\Category;
 
 $app = new Slim();//criando nova aplicação do slim para facilitar, cria uma nova rota?
 
@@ -168,6 +169,9 @@ $app->post("/admin/users/create", function(){//rota de criação via post, vai m
 
 	$_POST["inadmin"] = (isset($_POST["inadmin"]))?1:0;//fazendo uma operação ternaria para conferir se o campo inadmin foi marcado, se for, vai ser 1, se nao 0, (admininstrador)
 
+	$_POST['despassword'] = password_hash($_POST["despassword"], PASSWORD_DEFAULT, ["cost"=>12]
+    );//para gerar o hash no banco
+
 	$user->setData($_POST); //vai passar o que foi enviado pelo POST para o setData(), que vai acionar o __call(), para mandar para o $values
 
 	$user->save();//metodo para salvar os dados
@@ -200,9 +204,185 @@ $app->post("/admin/users/:iduser", function($iduser){//post para ediçao de cada
 });
 
 
+$app->get("/admin/forgot", function(){ //tela do esqueceu a senha
+
+	$page = new PageAdmin([
+      	"header"=>false,//para nao chamar o header
+      	"footer"=>false//para não chamar o footer
+	    ]);
+
+	$page->setTpl("forgot");
+
+
+});
+
+
+$app->post("/admin/forgot", function(){//recebe o email de mudança
+
+	$user = User::getForgot($_POST["email"]);
+
+	header("Location: /admin/forgot/sent");
+
+	var_dump($_POST["email"]);
+
+	exit;
+
+});
+
+$app->get("/admin/forgot/sent", function() {//tela envio do email de mudança
+
+	$page = new PageAdmin([
+      	"header"=>false,//para nao chamar o header
+      	"footer"=>false//para não chamar o footer
+	    ]);
+
+	$page->setTpl("forgot-sent");
+
+});
+
+
+$app->get("/admin/forgot/reset", function(){//tela de mudança de senha
+
+	$user = User::validForgotDecrypt($_GET["code"]);
+
+	$page = new PageAdmin([
+      	"header"=>false,//para nao chamar o header
+      	"footer"=>false//para não chamar o footer
+	    ]);
+
+	$page->setTpl("forgot-reset", array(
+				"name"=>$user["desperson"],
+				"code"=>$_GET["code"]
+	));
 
 
 
+});
+
+$app->post("/admin/forgot/reset", function(){//tela de mudança de senha - para validar a mudança de senha
+
+	$forgot = User::validForgotDecrypt($_GET["code"]);
+
+	User::setForgotUsed($forgot["idrecovery"]);
+
+	$user = new User();
+
+	$user->get((int)$forgot["iduser"]);
+
+	$password = password_hash($_POST["password"], PASSWORD_DEFAULT, ["cost"=>12]);
+
+	$user->setPassword($password);
+
+	$page = new PageAdmin([
+      	"header"=>false,//para nao chamar o header
+      	"footer"=>false//para não chamar o footer
+	    ]);
+
+	$page->setTpl("forgot-reset-success");
+
+
+});
+
+$app->get("/admin/categories", function(){
+
+	User::verifyLogin();
+
+	$categories = Category::listAll();
+
+	$page = new PageAdmin();
+
+	$page->setTpl("categories", array(
+						"categories"=>$categories
+				));
+
+
+});
+
+$app->get("/admin/categories/create", function(){
+
+	User::verifyLogin();
+
+	$page = new PageAdmin();
+
+	$page->setTpl("categories-create");
+
+
+});
+
+$app->post("/admin/categories/create", function(){
+
+	User::verifyLogin();
+
+	$category = new Category();
+
+	$category->setData($_POST);
+
+	$category->save();
+
+	header('Location: /admin/categories');
+
+	exit();
+
+
+});
+
+$app->get("/admin/categories/:idcategory/delete", function($idcategory){
+
+		User::verifyLogin();
+
+		$category = new Category();
+
+		$category->get((int)$idcategory);
+
+		$category->delete();
+
+		header('Location: /admin/categories');
+
+		exit;
+
+
+});
+
+$app->get("/admin/categories/:idcategory", function($idcategory){
+
+		User::verifyLogin();
+
+		$category = new Category();
+
+		$category->get((int)$idcategory);
+
+		$page = new PageAdmin();
+
+		$page->setTpl("categories-update",[
+				'category'=>$category->getValues()
+			]);
+
+
+		//header('Location: /admin/categories');
+
+		exit;
+
+
+});
+
+$app->post("/admin/categories/:idcategory", function($idcategory){
+
+		User::verifyLogin();
+
+		$category = new Category();
+
+		$category->get((int)$idcategory);
+
+		$category->setData($_POST);
+
+		$category->save();
+
+		header('Location: /admin/categories');
+
+		exit;
+
+
+});
 
 
 
