@@ -6,7 +6,7 @@ use \Hcode\DB\Sql;//usando a classe sql do namespace DB>Hcode
 use \Hcode\Model;//usando a classe model do namespace Hcode
 use \Hcode\Mailer;
 
-class Category extends Model{ 
+class Category extends Model{ //Para as categorias de produtos
 
 	//nao usa o metodo __call()
 	public static function listAll(){//le todos os dados da tabela
@@ -31,7 +31,7 @@ class Category extends Model{
 
 			$this->setData($results[0]);//vai rearmazenar os dados que retornaram novamente no objeto
 
-			Category::updateFile();
+			Category::updateFile();//vai sobrescrever o arquivo categories-menu.html
 
 	}
 
@@ -57,21 +57,22 @@ class Category extends Model{
 			':idcategory'=>$this->getidcategory()
 		]);
 
-		Category::updateFile();
+		Category::updateFile();//vai sobrescrever o arquivo categories-menu.html
 
 	}
 
-	public static function updateFile(){
+	public static function updateFile(){//vai sobrescrever o arquivo categories-menu.html, toda vez que uma categoria for feita, alterada ou excluida
 
 		$categories = Category::listAll();
 
 		$html=[];
 
-		foreach ($categories as $row) {
+		foreach ($categories as $row) {//categorias puxadas do bd sendo colocadas na var. $html com formatação em HTML
 			array_push($html, '<li><a href="/categories/'.$row['idcategory'].'">'.$row['descategory'].'</a></li>');
 		}
 
-		file_put_contents($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . "views". DIRECTORY_SEPARATOR . "categories-menu.html" , implode('', $html));
+		// funçao que sobrescreve o arquivo
+		file_put_contents($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . "views". DIRECTORY_SEPARATOR . "categories-menu.html" , implode('', $html));//vai converter o array $html em string
 
 	}
 
