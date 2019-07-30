@@ -2,6 +2,7 @@
 
 use Hcode\Page;
 use Hcode\Model\Product;
+use Hcode\Model\Category;
 
 $app->get('/', function() {  // Qual rota esta sendo chamada ===> rota principal
 
@@ -17,6 +18,24 @@ $app->get('/', function() {  // Qual rota esta sendo chamada ===> rota principal
     
 
     //vai chamar o destruct que chama footer ao final da execução
+
+
+});
+
+
+$app->get("/categories/:idcategory", function($idcategory){//menu de categoria na tela principal
+	
+
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+
+	$page = new Page();
+
+	$page->setTpl("category",[
+			'category'=>$category->getValues(),
+			'products'=>Product::checkList($category->getProducts())
+	]);
 
 
 });
