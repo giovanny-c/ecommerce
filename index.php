@@ -20,6 +20,8 @@ $app = new Slim();//criando nova aplicação do slim para facilitar, cria uma no
 
 $app->config('debug', true);
 
+
+require_once("functions.php");
 require_once("site.php");
 require_once("admin.php");
 require_once("admin-users.php");

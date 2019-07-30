@@ -19,6 +19,25 @@ class Product extends Model{ //Para as categorias de produtos
 	}
 
 
+	public static function checkList($list){
+
+		foreach ($list as &$row) {// & vai manipular a mesma variavel na memoria 
+			
+			$p = new Product();
+			$p->setData($row);
+			$row = $p->getValues();
+
+		}
+
+		return $list;
+
+
+	}
+
+
+	
+
+
 	public function save(){
 
 		$sql = new Sql();
