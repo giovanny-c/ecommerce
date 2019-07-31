@@ -111,6 +111,38 @@ class Category extends Model{ //Para as categorias de produtos
 
 	}
 
+//metodo para paginaçao, paginas do site
+	public function getProductsPage($page = 1, $itensPerPage = 3){
+
+		$start = ($page - 1 ) * $itensPerPage;
+
+		$sql = new Sql();
+
+		$results = $sql->select("
+			SELECT SQL_CALC_FOUND_ROWS * 
+			FROM tb_products a 
+			INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct 
+			INNER JOIN tb_categories c ON c.idcategory = b.idcategory 
+			WHERE c.idcategory = :idcategory
+			LIMIT $start, $itensPerPage;
+			",[
+				':idcategory'=>$this->getidcategory()
+			]);
+
+		
+		$resultsTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+
+		return [
+			'data'=>Product::checkList($results),//resultado da busca por pagina
+			'total'=>(int)$resultsTotal[0]["nrtotal"],//total de produtos na categoria
+			'pages'=>ceil($resultsTotal[0]["nrtotal"]/ $itensPerPage) //funçao do php que aredonda pra cima, vai sempre criar mais uma pagina se sobrar intens
+		];
+
+
+
+	}
+
 
 	public function addProduct(Product $product){
 
