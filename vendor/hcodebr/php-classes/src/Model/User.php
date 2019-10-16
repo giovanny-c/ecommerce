@@ -17,6 +17,58 @@ class User extends Model{ //extende da classe model
 	const SUCCESS = "UserSuccess";
 	//const KEY =
 
+
+	public static function getFromSession(){
+ 		
+ 		$user = new User();
+		
+		if (isset($_SESSION[User::SESSION]) && (int)$_SESSION[User::SESSION]['iduser']>0)
+		{
+			$user->setData($_SESSION[User::SESSION]);
+
+		}
+
+		return $user;
+
+
+	}
+
+	public static function checklogin($inadmin = true){
+
+		if( 
+			!isset($_SESSION[User::SESSION])//se a sessao nao for definida
+			|| 
+			!$_SESSION[User::SESSION]// se ela for falsa
+			||
+			!(int)$_SESSION[User::SESSION]["iduser"] > 0//verifica se o id do usuario nao for maior que zero
+		){
+			//nao esta logado
+			return false;
+
+		} else {
+
+			if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true )
+			{
+				return true;
+
+			} else if ($inadmin === false ){
+
+				return true;
+
+			}else {
+
+				return false;
+			}
+
+
+
+		}
+
+
+	}
+
+
+
 	public static function login($login, $password){//recebe os parametros login e password que vao ser usados para validação
 
 		$sql = new Sql();//instanciando a classe sql da pasta DB
@@ -66,15 +118,8 @@ class User extends Model{ //extende da classe model
 
 	public static function verifyLogin($inadmin = true){
 
-		if(
-			!isset($_SESSION[User::SESSION])//se a sessao nao for definida
-			|| 
-			!$_SESSION[User::SESSION]// se ela for falsa
-			||
-			!(int)$_SESSION[User::SESSION]["iduser"] > 0//verifica se o id do usuario nao for maior que zero
-			||
-			(bool)$_SESSION[User::SESSION]["inadmin"] !== $inadmin// se não for administrador
-		){ //se nenhum deles for valido, volta para a tela de login
+		if(User::checkLogin($inadmin))
+		{ //se nenhum deles for valido, volta para a tela de login
 		
 
 			header("Location: /admin/login");//redireciona para a tela de login
