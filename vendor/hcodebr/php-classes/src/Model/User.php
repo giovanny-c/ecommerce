@@ -118,7 +118,7 @@ class User extends Model{ //extende da classe model
 
 	public static function verifyLogin($inadmin = true){
 
-		if(User::checkLogin($inadmin))
+		if(!User::checkLogin($inadmin))
 		{ //se nenhum deles for valido, volta para a tela de login
 		
 
