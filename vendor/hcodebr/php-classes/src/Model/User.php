@@ -73,13 +73,12 @@ class User extends Model{ //extende da classe model
 
 		$sql = new Sql();//instanciando a classe sql da pasta DB
 
-		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN", array(
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b ON a.idperson = b.idperson WHERE a.deslogin = :LOGIN", array(
 			":LOGIN"=>$login  //fazendo o bind dos parametros
 		));
 		//usa o parametro $login para pesquisar no banco de dados se tem algum usuario com esse login, armazena o resultado em $results
 
-
-
+	
 		if(count($results) === 0 ){//se nao encontrar nenhum login
 
 			throw new \Exception("Usuário inexistente ou senha inválida.");
@@ -118,17 +117,23 @@ class User extends Model{ //extende da classe model
 
 	public static function verifyLogin($inadmin = true){
 
-		if(!User::checkLogin($inadmin))
-		{ //se nenhum deles for valido, volta para a tela de login
-		
+		if(!User::checklogin($inadmin)){//se nenhum deles for valido, volta para a tela de login
 
-			header("Location: /admin/login");//redireciona para a tela de login
+			if($inadmin){
 
+				header("Location: /admin/login");//redireciona para a tela de login
+			
+			}else{
+
+				header("Location: /login");
+			}
 			exit;
 
-		}
+	    }
 
 	}
+
+	
 
 	public static function logout(){//para deslogar
 
@@ -158,7 +163,7 @@ class User extends Model{ //extende da classe model
 			array(//parametros pegos com o __call, que estão no objeto
    				":desperson"=> $this->getdesperson(),
    				":deslogin"=> $this->getdeslogin(),
-   				":despassword"=> $this->getdespassword(),
+   				":despassword"=>User::getPasswordHash($this->getdespassword()),
    				":desemail"=> $this->getdesemail(),
    				":nrphone"=> $this->getnrphone(),
    				":inadmin"=> $this->getinadmin()         
@@ -193,7 +198,7 @@ class User extends Model{ //extende da classe model
 				":iduser"=>$this->getiduser(),//usando o iduser para fazer o update
    				":desperson"=> $this->getdesperson(),
    				":deslogin"=> $this->getdeslogin(),
-   				":despassword"=> $this->getdespassword(),
+   				":despassword"=>$this->getdespassword(),
    				":desemail"=> $this->getdesemail(),
    				":nrphone"=> $this->getnrphone(),
    				":inadmin"=> $this->getinadmin()         
@@ -327,6 +332,21 @@ var_dump($idrecovery);
     }
 
 
+    public static function setError($msg)
+	{
+		$_SESSION[User::ERROR] = $msg;
+	}
+	public static function getError()
+	{
+		$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
+		User::clearError();
+		return $msg;
+	}
+	public static function clearError()
+	{
+		$_SESSION[User::ERROR] = NULL;
+	}
+
     public static function setForgotUsed($idrecovery){
 
     	$sql = new Sql();
@@ -349,6 +369,17 @@ var_dump($idrecovery);
 
 
     }
+
+
+    public static function getPasswordHash($password){
+		
+		return password_hash($password, PASSWORD_DEFAULT, [
+	    	'cost'=>12
+	    ]);
+
+    }//APAGAR SE DER ERRO
+
+   
 
 }
 

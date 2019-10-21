@@ -83,8 +83,6 @@ $app->post("/admin/users/create", function(){//rota de criação via post, vai m
 
 	$_POST["inadmin"] = (isset($_POST["inadmin"]))?1:0;//fazendo uma operação ternaria para conferir se o campo inadmin foi marcado, se for, vai ser 1, se nao 0, (admininstrador)
 
-	$_POST['despassword'] = password_hash($_POST["despassword"], PASSWORD_DEFAULT, ["cost"=>12]
-    );//para gerar o hash no banco
 
 	$user->setData($_POST); //vai passar o que foi enviado pelo POST para o setData(), que vai acionar o __call(), para mandar para o $values
 
