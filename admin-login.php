@@ -43,7 +43,9 @@ $app->get("/admin/forgot/sent", function() {//tela envio do email de mudança
 
 $app->get("/admin/forgot/reset", function(){//tela de mudança de senha
 
+	//$user = User::validForgotDecrypt($_POST["code"]);
 	$user = User::validForgotDecrypt($_GET["code"]);
+
 
 	$page = new PageAdmin([
       	"header"=>false,//para nao chamar o header
@@ -61,7 +63,7 @@ $app->get("/admin/forgot/reset", function(){//tela de mudança de senha
 
 $app->post("/admin/forgot/reset", function(){//tela de mudança de senha - para validar a mudança de senha
 
-	$forgot = User::validForgotDecrypt($_GET["code"]);
+	$forgot = User::validForgotDecrypt($_POST["code"]);
 
 	User::setForgotUsed($forgot["idrecovery"]);
 

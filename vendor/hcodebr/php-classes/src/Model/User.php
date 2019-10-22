@@ -12,6 +12,7 @@ class User extends Model{ //extende da classe model
 
 	const SESSION = "User";//constante da sessao
 	const SECRET = "HcodePhp7_Secret";
+	const SECRET_IV = "HcodePhp7_Secret_IV";
 	const ERROR = "UserError";
 	const ERROR_REGISTER = "UserErrorRegister";
 	const SUCCESS = "UserSuccess";
@@ -221,8 +222,8 @@ class User extends Model{ //extende da classe model
 		));//usando a procedure criada no banco, tornando o processo mais rapido, vai deletar o usuario no tb_person e tb_user 
 	}
 
-
-	public static function getForgot($email){
+/*
+	public static function getForgot($email, $inadmin = true){
 
 		$sql = new Sql();
 
@@ -256,15 +257,23 @@ class User extends Model{ //extende da classe model
 			openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));// testar com essa func
 
 				$code = openssl_encrypt($dataRecovery['idrecovery'], 'aes-256-cbc', User::SECRET, 0, $iv);
+				
 				//var_dump($code);
 
 				//$result = base64_encode($iv.$code);
 
 				//var_dump($result);
+
+				if($inadmin === true) {
+
+					$link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
+
+				} else {
+
+					$link = "http://www.hcodecommerce.com.br/forgot/reset?code=$code";
+
+				}
 				
-
-				$link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
-
 				$mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir Senha da Hcode Store", "forgot", 
 					array(
 						"name"=>$data["desperson"],
@@ -290,13 +299,13 @@ class User extends Model{ //extende da classe model
 
     $data = base64_encode($code);
 
-     var_dump($data);
+    // var_dump($data);
 
      $iv = mb_substr($result, 0, openssl_cipher_iv_length('aes-256-cbc'), '8bit');
 
-var_dump($iv);
+//var_dump($iv);
      $idrecovery = openssl_decrypt($data, 'aes-256-cbc', User::SECRET, 0, $iv);
-	 
+	 var_dump($idrecovery);
 
 	    $sql = new Sql();
 
@@ -317,7 +326,7 @@ var_dump($iv);
 	     
 
 	    if (count($results) === 0){ 
-var_dump($idrecovery);
+//var_dump($idrecovery);
 
 	        throw new \Exception("Não foi possível recuperar a senha.");
 	    
@@ -329,24 +338,95 @@ var_dump($idrecovery);
 	    }
 
 
-    }
+    } */
+
+/////////// NOVO
+
+public static function getForgot($email, $inadmin = true)
+	{
+		$sql = new Sql();
+		$results = $sql->select("
+			SELECT *
+			FROM tb_persons a
+			INNER JOIN tb_users b USING(idperson)
+			WHERE a.desemail = :email;
+		", array(
+			":email"=>$email
+		));
+		if (count($results) === 0)
+		{
+			throw new \Exception("Não foi possível recuperar a senha.");
+		}
+		else
+		{
+			$data = $results[0];
+			$results2 = $sql->select("CALL sp_userspasswordsrecoveries_create(:iduser, :desip)", array(
+				":iduser"=>$data['iduser'],
+				":desip"=>$_SERVER['REMOTE_ADDR']
+			));
+			if (count($results2) === 0)
+			{
+				throw new \Exception("Não foi possível recuperar a senha.");
+			}
+			else
+			{
+				$dataRecovery = $results2[0];
+				$code = openssl_encrypt($dataRecovery['idrecovery'], 'AES-128-CBC', pack("a16", User::SECRET), 0, pack("a16", User::SECRET_IV));
+				$code = base64_encode($code);
+				if ($inadmin === true) {
+					$link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
+				} else {
+					$link = "http://www.hcodecommerce.com.br/forgot/reset?code=$code";
+					
+				}				
+				$mailer = new Mailer($data['desemail'], $data['desperson'], "Redefinir senha da Hcode Store", "forgot", array(
+					"name"=>$data['desperson'],
+					"link"=>$link
+				));				
+				$mailer->send();
+				return $link;
+			}
+		}
+	}
+
+public static function validForgotDecrypt($code)
+	{
+		$code = base64_decode($code);
+
+		
+
+		$idrecovery = openssl_decrypt($code, 'AES-128-CBC', pack("a16", User::SECRET), 0, pack("a16", User::SECRET_IV));
+
+		
+		$sql = new Sql();
 
 
-    public static function setError($msg)
-	{
-		$_SESSION[User::ERROR] = $msg;
-	}
-	public static function getError()
-	{
-		$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
-		User::clearError();
-		return $msg;
-	}
-	public static function clearError()
-	{
-		$_SESSION[User::ERROR] = NULL;
+		$results = $sql->select("
+			SELECT *
+			FROM tb_userspasswordsrecoveries a
+			INNER JOIN tb_users b USING(iduser)
+			INNER JOIN tb_persons c USING(idperson)
+			WHERE
+				a.idrecovery = :idrecovery
+				AND
+				a.dtrecovery IS NULL
+				AND
+				DATE_ADD(a.dtregister, INTERVAL 1 HOUR) >= NOW();
+		", array(
+			":idrecovery"=>$idrecovery
+		));
+		if (count($results) === 0)
+		{
+			throw new \Exception("Não foi possível recuperar a senha.");
+		}
+		else
+		{
+			return $results[0];
+		}
 	}
 
+
+    
     public static function setForgotUsed($idrecovery){
 
     	$sql = new Sql();
@@ -358,14 +438,16 @@ var_dump($idrecovery);
     }
 
 
-    public function setPassword(){
+    public function setPassword($password){
 
     	$sql = new Sql();
 
-    	$sql->query("UPDATE tb_user SET despassword = :password WHERE iduser = :iduser", array(
+    	$sql->query("UPDATE tb_users SET despassword = :password WHERE iduser = :iduser", array(
     					":password"=>$password,
     					":iduser"=>$this->getiduser()
     			      ));
+
+    	
 
 
     }
@@ -378,6 +460,27 @@ var_dump($idrecovery);
 	    ]);
 
     }//APAGAR SE DER ERRO
+
+
+	public static function setError($msg)
+	{
+			$_SESSION[User::ERROR] = $msg;
+	}
+		
+	public static function getError()
+	{
+			$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
+			User::clearError();
+			return $msg;
+	}
+	
+	public static function clearError()
+	{
+			$_SESSION[User::ERROR] = NULL;
+	}
+
+
+
 
 
     public static function setErrorRegister($msg){

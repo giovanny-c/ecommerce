@@ -1,0 +1,15 @@
+O e-mail usado para recuperaçao de senha é o meu da conta google
+- giocast1fs@gmail.com
+
+para usar a recuperação
+
+-acessar o arquivo Mailer.php
+ na vendor\hcodebr\php-clases\src
+
+-mudar a constante PASSWORD pela senha do email giocast1fs@gmail.com
+
+- acessar as opçoes de segurança da conta google
+ https://myaccount.google.com/u/0/security?hl=pt-BR
+
+e alterar o acesso a app menos suguro para ativado
+
