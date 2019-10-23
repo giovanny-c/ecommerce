@@ -285,6 +285,8 @@ $app->post("/register", function(){
 
     }
 
+
+
 	$user = new User();
 
 	$user->setData([
@@ -373,6 +375,118 @@ $app->post("/forgot/reset", function(){//tela de mudança de senha - para valida
 	$page = new Page();
 
 	$page->setTpl("forgot-reset-success");
+
+
+});
+
+$app->get("/profile", function(){
+
+
+
+	User::verifyLogin(false);
+
+	$user = User::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl("profile", [
+		'user'=>$user->getValues(),
+		'profileMsg'=>User::getSuccess(),
+		'profileError'=>User::getError()
+
+	]);
+
+});
+
+$app->post("/profile", function(){
+
+//var_dump($_POST['inadmin']);
+//exit;
+
+	User::verifyLogin(false);
+
+	if(checkLogin()){
+
+		
+
+
+		
+
+
+		User::setError("
+			Voce é um administrador, 
+			para alterar seu cadastro entre ");
+
+		
+
+		header('Location: /profile');
+		exit;
+
+
+	}
+
+	if (!isset($_POST['desperson']) || $_POST['desperson'] === ''){
+
+		User::setError("Preencha seu nome");
+
+		header('Location: /profile');
+		exit;
+	}
+
+	if (!isset($_POST['desemail']) || $_POST['desemail'] === ''){
+
+		User::setError("Preencha seu e-mail");
+
+		header('Location: /profile');
+		exit;
+	}
+
+	
+	$user = User::getFromSession();
+
+
+	if($_POST['desemail'] !== $user->getdesemail()){
+
+
+		if (User::checkLoginExist($_POST['desemail']) === true ){
+
+			User::setError("Este endereço de e-mail já esta cadastrado");
+
+			header('Location: /profile');
+			exit;
+
+		}
+
+
+	}
+
+   
+
+	//var_dump($_POST);
+	
+
+	$_POST['inadmin'] = $user->getinadmin();
+	$_POST['despassword'] = $user->getdespassword();
+	$_POST['deslogin'] = $_POST['desemail'];
+
+	
+
+	
+
+
+	$user->setData($_POST);
+
+
+
+	$user->update();
+
+	$_SESSION[User::SESSION] = $user->getValues();
+
+	User::setSuccess("Cadastro alterado com sucesso.");
+
+	header('Location: /profile');
+
+	exit;
 
 
 });
