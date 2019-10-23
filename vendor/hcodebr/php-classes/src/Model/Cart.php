@@ -55,7 +55,7 @@ class Cart extends Model{ //Para as categorias de produtos
 	}
 
 
-	public function seToSession(){
+	public function setToSession(){
 
 		$_SESSION[Cart::SESSION] = $this->getvalues();
 
@@ -282,7 +282,7 @@ class Cart extends Model{ //Para as categorias de produtos
 
 		}
 
-		public static function setMsgError()
+		public static function setMsgError($msg)
 		{
 
 			$_SESSION[Cart::SESSION_ERROR] = $msg;
@@ -344,6 +344,16 @@ class Cart extends Model{ //Para as categorias de produtos
 			
 
 		}
+
+
+			public static function removeFromSession(){
+		    
+		    	$_SESSION[Cart::SESSION] = NULL;
+			
+			}
+
+
+
 
 
 		

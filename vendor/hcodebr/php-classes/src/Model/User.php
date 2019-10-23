@@ -102,6 +102,7 @@ class User extends Model{ //extende da classe model
 
 			$_SESSION[User::SESSION] =  $user->getValues();//criando uma sessao e colocando os dados dentro da sessao
 
+			
 			return $user;
 
 
