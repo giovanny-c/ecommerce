@@ -172,7 +172,14 @@ class Cart extends Model{ //Para as categorias de produtos
 		    	'idcart'=>$this->getidcart()
 		    ]);
 
-		return Product::checkList($rows);
+
+			return Product::checkList($rows);
+
+			
+
+				
+		
+		
 
 	}
 
@@ -338,7 +345,7 @@ class Cart extends Model{ //Para as categorias de produtos
 
 			$totals = $this->getProductsTotals();
 
-			$this->setvlsubtotal($totals['vlprice']);
+			$a = $this->setvlsubtotal($totals['vlprice']);
 			$this->setvltotal($totals['vlprice'] + $this->getvlfreight());
 
 			
@@ -346,11 +353,11 @@ class Cart extends Model{ //Para as categorias de produtos
 		}
 
 
-			public static function removeFromSession(){
+		public static function removeFromSession(){
 		    
 		    	$_SESSION[Cart::SESSION] = NULL;
 			
-			}
+		}
 
 
 
