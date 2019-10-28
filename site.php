@@ -285,6 +285,18 @@ $app->post("/checkout", function(){
 
 	$cart->getCalculateTotal();
 
+	
+	
+
+if(!$cart->getProducts() !=''){ //verifica se tem algum produto no carrinho antes de finalizar o pedido
+
+
+	echo"FAZER MSG DE ERRO";
+	var_dump($cart->getProducts()); //fazer msg de erro depois
+
+	exit;
+
+}
 
 	$order = new Order();
 
@@ -339,7 +351,7 @@ $app->post("/login", function(){
 
 	}
 
-	
+	//fazer um if() se tiver produtos no carrinho redireciona para o checkout, se nao redireciona pra minha conta ou outra pagina
 
 	header("Location: /checkout");
 
@@ -711,6 +723,57 @@ $app->get("/boleto/:idorder", function($idorder){
 	require_once($path . "funcoes_itau.php");
 	require_once($path . "layout_itau.php");
 
+
+
+
+
+});
+
+
+$app->get("/profile/orders", function(){
+
+	User::verifyLogin(false);
+
+	$user = User::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl("profile-orders", [
+		'orders'=>$user->getOrders()
+	]);
+
+
+
+
+});
+
+
+$app->get("/profile/orders/:idorder", function($idorder){
+
+
+	User::verifyLogin(false);
+
+	$order = new Order();
+
+	$order->get((int)$idorder);
+
+//var_dump($order->getValues());
+//	exit;
+
+	$cart = new Cart();
+
+	$cart->get((int)$order->getidcart());//pega o idcart do pedido em que se esta clicando nao o da sessao
+
+	$cart->getCalculateTotal();//recalcula os valores do pedido para as variaveis do template usarem, usa o idcart pego na linha acima e calcula baseado nesse carrinho
+
+	$page = new Page();
+
+
+	$page->setTpl("profile-orders-detail", [
+		'order'=>$order->getValues(),
+		'cart'=>$cart->getValues(),//pega os valores para usar no template
+		'products'=>$cart->getProducts()// pega os produtos que estavam nesse carrinho
+	]);
 
 
 
