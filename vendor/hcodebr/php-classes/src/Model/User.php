@@ -18,7 +18,6 @@ class User extends Model{ //extende da classe model
 	const SUCCESS = "UserSuccess";
 	//const KEY =
 
-
 	public static function getFromSession(){
  		
  		$user = new User();

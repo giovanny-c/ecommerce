@@ -655,7 +655,7 @@ $app->get("/order/:idorder", function($idorder){
 
 $app->get("/boleto/:idorder", function($idorder){
 
- User::verifyLogin();
+ User::verifyLogin(false);
 
  $order = new Order();
 

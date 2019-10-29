@@ -62,11 +62,11 @@ class Address extends Model{ //Para as categorias de produtos
 
 			':idaddress'=>$this->getidaddress(),
 			':idperson'=>$this->getidperson(),
-			':desaddress'=>utf8_decode($this->getdesaddress()),
-			':descomplement'=>utf8_decode($this->getdescomplement()),
-			':descity'=>utf8_decode($this->getdescity()),
-			':desstate'=>utf8_decode($this->getdesstate()),
-			':descountry'=>utf8_decode($this->getdescountry()),
+			':desaddress'=>($this->getdesaddress()),
+			':descomplement'=>($this->getdescomplement()),
+			':descity'=>($this->getdescity()),
+			':desstate'=>($this->getdesstate()),
+			':descountry'=>($this->getdescountry()),
 			':deszipcode'=>$this->getdeszipcode(),
 			':desdistrict'=>$this->getdesdistrict()
 		]);

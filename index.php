@@ -28,6 +28,7 @@ require_once("admin-users.php");
 require_once("admin-categories.php");
 require_once("admin-login.php");
 require_once("admin-products.php");
+require_once("admin-orders.php");
 
 
 // -------- OLHAR OS ARQUIVOS HTML DAS RESPECTIVAS ROTAS, POIS SÃO ALTERADOS PARA QUE OS DADOS SEJAM MOSTRADOS NA TELA DE MANEIRA CORETA -------------------------
