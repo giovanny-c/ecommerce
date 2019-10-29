@@ -8,13 +8,42 @@ $app->get("/admin/users", function(){//Qual rota esta sendo chamada ===> rota da
 
 	User::verifyLogin();//metodo statico para verificar login
 
-	$users = User::listAll();//metodo statico para listar os usuarios
+	$search = (isset($_GET['search'])) ? $_GET['search'] : "";
+
+	$page = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
+
+	if ($search != ''){
+
+		$pagination = User::getPageSearch($search, $page );//metodo statico para listar os usuarios
+
+	}else{
+
+		$pagination = User::getPage($page);//metodo statico para listar os usuarios
+
+	}
+
+	
+
+	$pages = [];
+
+	for ($x=0; $x < $pagination['pages']; $x++) { 
+
+		array_push($pages,[
+			'href'=>'/admin/users?'.http_build_query([
+				'page'=>$x+1,
+				'search'=>$search
+						]),
+				'text'=>$x+1	
+		]);
+	}
 
 	$page = new PageAdmin();//instanciando a classe PageAdmin
 	//quando criado chama metodo construct que chama o header.html na tela
 
 	$page->setTpl("users", array(
-		"users"=>$users //passando a variavel $users como parametro, a var. contem os resultados que serão listados na tabela quando a pagina for chamada 
+		"users"=>$pagination['data'], 
+		"search"=>$search,
+		"pages"=>$pages
 						));
 
 							// usando o setTpl com o parametro users para chamar o arquivousers.html
