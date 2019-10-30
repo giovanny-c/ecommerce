@@ -146,6 +146,75 @@ class Order extends Model {
 
 
 
+	public static function getPage($page = 1, $itensPerPage = 10){
+
+		$start = ($page - 1 ) * $itensPerPage;
+
+		$sql = new Sql();
+
+		$results = $sql->select("
+			SELECT SQL_CALC_FOUND_ROWS * 
+			FROM tb_orders a 
+			INNER JOIN tb_ordersstatus b USING(idstatus) 
+			INNER JOIN tb_carts c USING(idcart)
+			INNER JOIN tb_users d ON d.iduser = a.iduser
+			INNER JOIN tb_addresses e USING(idaddress)
+			INNER JOIN tb_persons f ON f.idperson = d.idperson
+			ORDER BY a.dtregister DESC
+			LIMIT $start, $itensPerPage;
+			");
+
+		
+		$resultsTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+
+		return [
+			'data'=>$results,//resultado da busca por pagina
+			'total'=>(int)$resultsTotal[0]["nrtotal"],//total de produtos na categoria
+			'pages'=>ceil($resultsTotal[0]["nrtotal"]/ $itensPerPage) //funçao do php que aredonda pra cima, vai sempre criar mais uma pagina se sobrar intens
+		];
+
+
+
+	}
+
+public static function getPageSearch($search, $page = 1, $itensPerPage = 10){
+
+		$start = ($page - 1 ) * $itensPerPage;
+
+		$sql = new Sql();
+
+		$results = $sql->select("
+			SELECT SQL_CALC_FOUND_ROWS * 
+			FROM tb_orders a 
+			INNER JOIN tb_ordersstatus b USING(idstatus) 
+			INNER JOIN tb_carts c USING(idcart)
+			INNER JOIN tb_users d ON d.iduser = a.iduser
+			INNER JOIN tb_addresses e USING(idaddress)
+			INNER JOIN tb_persons f ON f.idperson = d.idperson
+			WHERE a.idorder = :id 
+			OR f.desperson LIKE :search 
+			ORDER BY a.dtregister DESC
+			LIMIT $start, $itensPerPage;
+			",[
+				'id'=>$search,
+				':search'=>'%'.$search."%"
+			]);
+
+		
+		$resultsTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+
+		return [
+			'data'=>$results,//resultado da busca por pagina
+			'total'=>(int)$resultsTotal[0]["nrtotal"],//total de produtos na categoria
+			'pages'=>ceil($resultsTotal[0]["nrtotal"]/ $itensPerPage) //funçao do php que aredonda pra cima, vai sempre criar mais uma pagina se sobrar intens
+		];
+
+
+
+	}
+
 
 }
 ?>
