@@ -172,6 +172,67 @@ class Category extends Model{ //Para as categorias de produtos
 	}
 
 
+public static function getPage($page = 1, $itensPerPage = 10){
+
+		$start = ($page - 1 ) * $itensPerPage;
+
+		$sql = new Sql();
+
+		$results = $sql->select("
+			SELECT SQL_CALC_FOUND_ROWS * 
+			FROM tb_categories 
+			ORDER BY descategory
+			LIMIT $start, $itensPerPage;
+			");
+
+		
+		$resultsTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+
+		return [
+			'data'=>$results,//resultado da busca por pagina
+			'total'=>(int)$resultsTotal[0]["nrtotal"],//total de produtos na categoria
+			'pages'=>ceil($resultsTotal[0]["nrtotal"]/ $itensPerPage) //funçao do php que aredonda pra cima, vai sempre criar mais uma pagina se sobrar intens
+		];
+
+
+
+	}
+
+
+
+	public static function getPageSearch($search, $page = 1, $itensPerPage = 10){
+
+		$start = ($page - 1 ) * $itensPerPage;
+
+		$sql = new Sql();
+
+		$results = $sql->select("
+			SELECT SQL_CALC_FOUND_ROWS * 
+			FROM tb_categories 
+			WHERE descategory LIKE :search 
+		    ORDER BY descategory
+			LIMIT $start, $itensPerPage;
+			",[
+				':search'=>'%'.$search."%"
+			]);
+
+		
+		$resultsTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+
+		return [
+			'data'=>$results,//resultado da busca por pagina
+			'total'=>(int)$resultsTotal[0]["nrtotal"],//total de produtos na categoria
+			'pages'=>ceil($resultsTotal[0]["nrtotal"]/ $itensPerPage) //funçao do php que aredonda pra cima, vai sempre criar mais uma pagina se sobrar intens
+		];
+
+
+
+	}
+
+
+
 }
 
 ?>
