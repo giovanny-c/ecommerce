@@ -58,15 +58,16 @@ class Address extends Model{ //Para as categorias de produtos
 
 		$sql = new Sql();
 
-		$results = $sql->select("CALL sp_addresses_save(:idaddress, :idperson, :desaddress, :descomplement, :descity, :desstate, :descountry, :deszipcode, :desdistrict)",[
+		$results = $sql->select("CALL sp_addresses_save(:idaddress, :idperson, :desaddress, :desnumber, :descomplement, :descity, :desstate, :descountry, :deszipcode, :desdistrict)",[
 
 			':idaddress'=>$this->getidaddress(),
 			':idperson'=>$this->getidperson(),
-			':desaddress'=>($this->getdesaddress()),
-			':descomplement'=>($this->getdescomplement()),
-			':descity'=>($this->getdescity()),
-			':desstate'=>($this->getdesstate()),
-			':descountry'=>($this->getdescountry()),
+			':desaddress'=>$this->getdesaddress(),
+			':desnumber'=>$this->getdesnumber(),
+			':descomplement'=>$this->getdescomplement(),
+			':descity'=>$this->getdescity(),
+			':desstate'=>$this->getdesstate(),
+			':descountry'=>$this->getdescountry(),
 			':deszipcode'=>$this->getdeszipcode(),
 			':desdistrict'=>$this->getdesdistrict()
 		]);

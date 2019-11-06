@@ -200,6 +200,7 @@ $app->get("/checkout", function(){
 
 	if (!$address->getdesaddress()) $address->setdesaddress('');
 	if (!$address->getdesnumber()) $address->setdesnumber('');
+	if (!$address->getdesnumber()) $address->setdesnumber('');
 	if (!$address->getdescomplement()) $address->setdescomplement('');
 	if (!$address->getdesdistrict()) $address->setdesdistrict('');
 	if (!$address->getdescity()) $address->setdescity('');
@@ -236,6 +237,13 @@ $app->post("/checkout", function(){
 	if (!isset($_POST['desaddress']) || $_POST['desaddress'] === '') {
 		
 		Address::setMsgError("Informe o endereço.");
+		header('Location: /checkout');
+		exit;
+	}
+
+	if (!isset($_POST['desnumber']) || $_POST['desnumber'] === '') {
+		
+		Address::setMsgError("Informe o numero.");
 		header('Location: /checkout');
 		exit;
 	}
